@@ -208,22 +208,35 @@ func versionUp(prev goversioninfo.FileVersion, level VersionLevel) goversioninfo
 }
 
 func main() {
-	fileName := "versioninfo.json"
+	notationValue := flag.String("notation", string(NotationNormal), "notation for version - simple/normal/detail")
+	flag.StringVar(notationValue, "n", *notationValue, "alias for -notation")
 
-	notationValue := flag.String("notation", string(NotationNormal), "notation for version - simple/normal[default]/detail")
-	levelValue := flag.String("level", string(LevelPatch), "level for versioning - major/minor/patch[default]/build")
-	targetValue := flag.String("target", string(TargetBoth), "target for versioning - both[default]/file/product")
+	levelValue := flag.String("level", string(LevelPatch), "level for versioning - major/minor/patch/build")
+	flag.StringVar(levelValue, "l", *levelValue, "alias for -level")
+
+	targetValue := flag.String("target", string(TargetBoth), "target for versioning - both/file/product")
+	flag.StringVar(targetValue, "t", *targetValue, "alias for -target")
+
+	outputName := flag.String("output", "", "output file name, blank for input itself")
+	flag.StringVar(outputName, "o", *outputName, "alias for -output")
 
 	flag.Parse()
+
 	notation := VersionNotation(*notationValue)
 	level := VersionLevel(*levelValue)
 	target := VersionTarget(*targetValue)
 
-	if len(flag.Args()) > 1 {
-		fileName = flag.Arg(0)
+	inputFileName := "versioninfo.json"
+	args := flag.Args()
+	if len(args) >= 1 {
+		inputFileName = args[0]
+	}
+	outputFileName := inputFileName
+	if *outputName != "" {
+		outputFileName = *outputName
 	}
 
-	info, err := parseVersionInfoFromFile(fileName)
+	info, err := parseVersionInfoFromFile(inputFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -251,7 +264,7 @@ func main() {
 		setProductVersion(&info, productVersion, notation)
 	}
 
-	if err = overwriteVersionInfoToFile("result.json", info); err != nil {
+	if err = overwriteVersionInfoToFile(outputFileName, info); err != nil {
 		log.Fatal(err)
 	}
 
