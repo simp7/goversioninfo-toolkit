@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -13,16 +14,33 @@ import (
 	"github.com/josephspurrier/goversioninfo"
 )
 
-type VersionNotation int
+type VersionNotation string
 
 const (
-	NotationSimple VersionNotation = iota
-	NotationNormal
-	NotationDetail
+	NotationSimple VersionNotation = "simple"
+	NotationNormal VersionNotation = "normal"
+	NotationDetail VersionNotation = "detail"
+)
+
+type VersionLevel string
+
+const (
+	LevelMajor VersionLevel = "major"
+	LevelMinor VersionLevel = "minor"
+	LevelPatch VersionLevel = "patch"
+	LevelBuild VersionLevel = "build"
 )
 
 var (
 	ErrInvalidStringVersion = errors.New("invalid error format")
+)
+
+type VersionTarget string
+
+const (
+	TargetBoth    VersionTarget = "both"
+	TargetFile    VersionTarget = "file"
+	TargetProduct VersionTarget = "product"
 )
 
 func parseVersionInfo(data []byte) (version goversioninfo.VersionInfo, err error) {
@@ -123,7 +141,6 @@ func parseVersion(versionString string) (result goversioninfo.FileVersion, err e
 			return
 		}
 		result.Major = element
-		fallthrough
 	default:
 		err = ErrInvalidStringVersion
 	}
@@ -151,10 +168,59 @@ func setProductVersion(target *goversioninfo.VersionInfo, version goversioninfo.
 	target.StringFileInfo.ProductVersion = stringifyVersion(version, notation)
 }
 
+func getFileVersion(info goversioninfo.VersionInfo) (target goversioninfo.FileVersion, err error) {
+	if !isVersionEmpty(info.FixedFileInfo.FileVersion) {
+		target = info.FixedFileInfo.FileVersion
+	} else {
+		target, err = parseVersion(info.StringFileInfo.FileVersion)
+	}
+	return
+}
+
+func getProductVersion(info goversioninfo.VersionInfo) (target goversioninfo.FileVersion, err error) {
+	if !isVersionEmpty(info.FixedFileInfo.ProductVersion) {
+		target = info.FixedFileInfo.ProductVersion
+	} else {
+		target, err = parseVersion(info.StringFileInfo.ProductVersion)
+	}
+	return
+}
+
+func versionUp(prev goversioninfo.FileVersion, level VersionLevel) goversioninfo.FileVersion {
+	result := prev
+	switch level {
+	case LevelMajor:
+		result.Major += 1
+		result.Minor = 0
+		result.Patch = 0
+		result.Build = 0
+	case LevelMinor:
+		result.Minor += 1
+		result.Patch = 0
+		result.Build = 0
+	case LevelPatch:
+		result.Patch += 1
+		result.Build = 0
+	case LevelBuild:
+		result.Build += 1
+	}
+	return result
+}
+
 func main() {
 	fileName := "versioninfo.json"
-	if len(os.Args) > 1 {
-		fileName = os.Args[1]
+
+	notationValue := flag.String("notation", string(NotationNormal), "notation for version - simple/normal[default]/detail")
+	levelValue := flag.String("level", string(LevelPatch), "level for versioning - major/minor/patch[default]/build")
+	targetValue := flag.String("target", string(TargetBoth), "target for versioning - both[default]/file/product")
+
+	flag.Parse()
+	notation := VersionNotation(*notationValue)
+	level := VersionLevel(*levelValue)
+	target := VersionTarget(*targetValue)
+
+	if len(flag.Args()) > 1 {
+		fileName = flag.Arg(0)
 	}
 
 	info, err := parseVersionInfoFromFile(fileName)
@@ -162,19 +228,29 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var target goversioninfo.FileVersion
-	if !isVersionEmpty(info.FixedFileInfo.FileVersion) {
-		target = info.FixedFileInfo.FileVersion
-	} else {
-		var err error
-		target, err = parseVersion(info.StringFileInfo.FileVersion)
-		if err != nil {
-			log.Fatal(err)
-		}
+	fileVersion, err := getFileVersion(info)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	setFileVersion(&info, target, NotationDetail)
-	setProductVersion(&info, target, NotationDetail)
+	productVersion, err := getProductVersion(info)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileVersion = versionUp(fileVersion, level)
+	productVersion = versionUp(productVersion, level)
+
+	switch target {
+	case TargetFile:
+		setFileVersion(&info, fileVersion, notation)
+	case TargetProduct:
+		setProductVersion(&info, productVersion, notation)
+	case TargetBoth:
+		setFileVersion(&info, fileVersion, notation)
+		setProductVersion(&info, productVersion, notation)
+	}
+
 	if err = overwriteVersionInfoToFile("result.json", info); err != nil {
 		log.Fatal(err)
 	}
