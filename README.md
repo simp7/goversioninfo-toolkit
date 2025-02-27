@@ -1,4 +1,4 @@
-# goversion-toolkit
+# goversioninfo-toolkit
 
 This is toolkit for [github.com/josephspurrier/goversioninfo](https://github.com/josephspurrier/goversioninfo)
 
