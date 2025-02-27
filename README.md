@@ -6,7 +6,7 @@ This is toolkit for [github.com/josephspurrier/goversioninfo](https://github.com
 
 As this is toolkit for goversioninfo, you need to follow goversioninfo's manual to use bellow tools.
 
-## exevup - tool for versioning up
+## exevup - tool for version up
 
 ### Usage
 
@@ -33,7 +33,7 @@ file name is input file for versioning. default file is versioninfo.json, which 
   -target(-t)=[both/file/product]: target for versioning, default is both
 ```
 
-You also can see description for flags by typing following command
+You also can see descriptions for flags by typing following command
 ```
 exevup --help
 ```
