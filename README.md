@@ -26,17 +26,16 @@ file name is input file for versioning. default file is versioninfo.json, which 
 
 ### Command-Line Flags
 
-Complete list of the flags for exevup,
-
-```
-    go mod
-```
-
 ```
   -level(-l)=[major/minor/patch/build]: level for versioning, default is patch
   -notation(-n)=[simple/normal/detail]: notation for version, default is normal
   -output(-o)={file name}: output file name, default is input file itself
   -target(-t)=[both/file/product]: target for versioning, default is both
+```
+
+You also can see description for flags by typing following command
+```
+exevup --help
 ```
 
 ## Issues
