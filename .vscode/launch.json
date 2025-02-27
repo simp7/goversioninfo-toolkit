@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "main.go",
-      "args": ["-notation=detail", "-level=major", "-target=file"]
+      "args": ["-notation=detail", "-level=build"]
     }
   ]
 }
