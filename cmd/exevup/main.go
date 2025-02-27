@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/simp7/autoexeversion/model"
+	"github.com/simp7/goversioninfo-toolkit/model"
 )
 
 func parseVersionInfoFromFile(fileName string) (model.Info, error) {

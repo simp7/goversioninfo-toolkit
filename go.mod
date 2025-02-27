@@ -1,6 +1,6 @@
-module github.com/simp7/autoexeversion
+module github.com/simp7/goversioninfo-toolkit
 
-go 1.24.0
+go 1.23.6
 
 require github.com/josephspurrier/goversioninfo v1.4.1
 
