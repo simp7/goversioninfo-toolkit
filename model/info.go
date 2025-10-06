@@ -51,16 +51,16 @@ func (i Info) ProductVersionUpdated(version Version, notation VersionNotation) (
 	return result
 }
 
-func (i Info) VersionUpdated(fileVersion Version, productVersion Version, target VersionTarget, notation VersionNotation) (reseult Info) {
-	reseult = i
+func (i Info) VersionUpdated(fileVersion Version, productVersion Version, target VersionTarget, notation VersionNotation) (result Info) {
+	result = i
 	switch target {
 	case TargetFile:
-		reseult = reseult.FileVersionUpdated(fileVersion, notation)
+		result = result.FileVersionUpdated(fileVersion, notation)
 	case TargetProduct:
-		reseult = reseult.ProductVersionUpdated(fileVersion, notation)
+		result = result.ProductVersionUpdated(productVersion, notation)
 	case TargetBoth:
-		reseult = reseult.FileVersionUpdated(fileVersion, notation)
-		reseult = reseult.ProductVersionUpdated(fileVersion, notation)
+		result = result.FileVersionUpdated(fileVersion, notation)
+		result = result.ProductVersionUpdated(productVersion, notation)
 	}
 	return
 }

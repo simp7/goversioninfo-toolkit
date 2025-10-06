@@ -23,9 +23,6 @@ func parseVersionInfoFromFile(fileName string) (model.Info, error) {
 
 	data, err := io.ReadAll(file)
 	if err != nil {
-		log.Println(err)
-	}
-	if err != nil {
 		return model.Info{}, err
 	}
 
@@ -111,5 +108,4 @@ func main() {
 		log.Fatal(err)
 	}
 
-	return
 }
