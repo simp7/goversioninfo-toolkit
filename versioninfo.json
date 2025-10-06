@@ -1,0 +1,20 @@
+{
+	"FixedFileInfo": {
+		"FileVersion": {
+			"Major": 1,
+			"Minor": 0,
+			"Patch": 0,
+			"Build": 0
+		},
+		"ProductVersion": {
+			"Major": 1,
+			"Minor": 0,
+			"Patch": 0,
+			"Build": 0
+		}
+	},
+	"StringFileInfo": {
+		"FileVersion": "1.0.0.0",
+		"ProductVersion": "1.0.0.0"
+	}
+}
